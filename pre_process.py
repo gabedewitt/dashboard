@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 dict_arq ={ 2018: 'dados_PROCON/reclamacoes-fundamentadas-2018-em-zip/CNRF2018.csv',
             2017: 'dados_PROCON/cnrf2017/CNRF_2017.csv',
             2019: 'dados_PROCON/crf2019-dados-abertos/CRF2019 Dados Abertos.csv',
@@ -42,6 +41,15 @@ for year in dict_arq.keys():
   print('OK {}'.format(name))
 
 df_all = pd.concat(df_names)
+df_all.drop(['AnoCalendario','CodigoRegiao','RadicalCNPJ','NomeFantasiaRFB','RazaoSocialRFB','CNAEPrincipal','CodigoAssunto','CodigoProblema'],inplace= True, axis = 1)
+df_all['DataArquivamento'] = pd.to_datetime(df_all['DataArquivamento'], format='%Y-%m-%d %H:%M:%S.%f') #%Y-%m-%d %H:%M:%S
+df_all['DataAbertura'] =  pd.to_datetime(df_all['DataAbertura'], format='%Y-%m-%d %H:%M:%S.%f') #%Y-%m-%d %H:%M:%S
+df_all['Ano'] = pd.DatetimeIndex(df_all['DataArquivamento']).year
+df_all['Mês'] = pd.DatetimeIndex(df_all['DataArquivamento']).month
+df_all['Dia'] = pd.DatetimeIndex(df_all['DataArquivamento']).day
+df_all['Dia da Semana'] = pd.DatetimeIndex(df_all['DataArquivamento']).weekday
+df_all['Tempo de Atendimento'] = df_all['DataArquivamento'] - df_all['DataAbertura']
 
-df_all.to_csv('dados_PROCON/dados_consolidados.csv')
+
+df_all.to_csv('dados_consolidados.csv')
 
