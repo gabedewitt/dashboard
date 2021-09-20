@@ -1,7 +1,8 @@
+from enum import unique
 from pkg_resources import run_script
 import streamlit as st
-import plotly.graph_objects as go
 import pandas as pd
+import matplotlib.pyplot as plt
 
 columns_names = ['DataArquivamento', 'DataAbertura', 'Regiao', 'UF', 'strRazaoSocial',
        'strNomeFantasia', 'Tipo', 'NumeroCNPJ', 'DescCNAEPrincipal',
@@ -66,5 +67,18 @@ df = create_df()
 
 st.line_chart(df['Ano'].value_counts())
 
-st.bar_chart(df['SexoConsumidor'].value_counts())
+#fig1, ax1 = plt.subplots()
+#ax1.pie(df[].value_counts(),labels=df['SexoConsumidor'].unique())
+#ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+
+
+data = df['SexoConsumidor']
+sx_cat = df['SexoConsumidor'].unique()[:3]
+
+fig1, ax1 = plt.subplots()
+ax1.pie(df['SexoConsumidor'].value_counts(), labels=sx_cat, autopct='%.0f%%')
+ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+st.pyplot(fig1)
 
