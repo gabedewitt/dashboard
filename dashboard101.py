@@ -3,12 +3,18 @@ from pkg_resources import run_script
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import plotly.express as px
+import numpy as np
+import plotly.graph_objects as go
 columns_names = ['DataArquivamento', 'DataAbertura', 'Regiao', 'UF', 'strRazaoSocial',
        'strNomeFantasia', 'Tipo', 'NumeroCNPJ', 'DescCNAEPrincipal',
        'Atendida', 'DescricaoAssunto', 'DescricaoProblema', 'SexoConsumidor',
        'FaixaEtariaConsumidor', 'CEPConsumidor', 'Ano', 'Mês', 'Dia',
        'Dia da Semana', 'Tempo de Atendimento']
+
+st.set_page_config("wide", 
+                   initial_sidebar_state="collapsed",
+                    page_icon= '📊')
 
 @st.cache
 def create_df():
@@ -65,20 +71,29 @@ def create_df():
 
 df = create_df()
 
-st.line_chart(df['Ano'].value_counts())
+with st.sidebar: 
+    st.selectbox('Selecione o ano', df.Ano.dropna().sort_values().unique())
 
-#fig1, ax1 = plt.subplots()
-#ax1.pie(df[].value_counts(),labels=df['SexoConsumidor'].unique())
-#ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+st.bar_chart(df.Ano.value_counts())
 
+df1 = df.DescCNAEPrincipal.value_counts().head(10)
+fig1 = px.bar(df1, orientation= 'h', color = df1.index)
+fig1.update_yaxes(showticklabels=False)
+fig1.update_layout(showlegend=False)
+st.plotly_chart(fig1, use_container_width=True)
+st.dataframe(df1.index)
+col1, col2 = st.columns(2)
 
+df2 = df.SexoConsumidor.value_counts()
+fig2 = px.pie(df2, values = df2.values, color = df2.index, hole=.3)
+col1.plotly_chart(fig2, use_container_width=True)
+col1.dataframe(df2)
 
-data = df['SexoConsumidor']
-sx_cat = df['SexoConsumidor'].unique()[:3]
+df3 = df.Atendida.value_counts()
+fig3 = px.pie(df3, values = df3.values, color = df3.index, hole=.3)
+col2.plotly_chart(fig3, use_container_width=True)
+col2.dataframe(df3)
 
-fig1, ax1 = plt.subplots()
-ax1.pie(df['SexoConsumidor'].value_counts(), labels=sx_cat, autopct='%.0f%%')
-ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-
-st.pyplot(fig1)
-
+df4 = df.FaixaEtariaConsumidor.value_counts()
+fig4 = px.bar(df4, orientation= 'v', color = df4.index)
+st.plotly_chart(fig4, use_container_width=True)
