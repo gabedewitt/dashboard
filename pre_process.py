@@ -42,7 +42,7 @@ try:
   os.path('dados_PROCON/cnrf2017')
 except:
   for caminho in list_zip:
-    caminho_certo = 'dados_PROCON/' + caminho[:-4]
+    caminho_certo = caminho[:-4]
     with zipfile.ZipFile(caminho, 'r') as zip_ref:
       zip_ref.extractall(caminho_certo)
 
