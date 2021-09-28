@@ -1,5 +1,6 @@
+import os
 import pandas as pd
-
+import zipfile
 dict_arq ={ 2018: 'dados_PROCON/reclamacoes-fundamentadas-2018-em-zip/CNRF2018.csv',
             2017: 'dados_PROCON/cnrf2017/CNRF_2017.csv',
             2019: 'dados_PROCON/crf2019-dados-abertos/CRF2019 Dados Abertos.csv',
@@ -13,43 +14,36 @@ dict_problematicos ={2009: 'dados_PROCON/reclamacoes-fundamentadas-sindec-2009/r
                      2011: 'dados_PROCON/reclamacoes-fundamentadas-sindec-2011/reclamacoes-fundamentadas-sindec-2011.csv',
                     }  
 
-pd.options.display.float_format = '{:.0f}'.format
+dict_zip ={ 2018: 'dados_PROCON/zips/reclamacoes-fundamentadas-2018-em-zip.zip',
+            2017: 'dados_PROCON/zips/cnrf2017.zip',
+            2019: 'dados_PROCON/zips/crf2019-dados-abertos.zip',
+            2012: 'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2012.zip',
+            2013: 'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2013-1.zip',
+            2014: 'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2014.zip',
+            2015: 'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2015.zip',
+            2016: 'dados_PROCON/zips/cnrf2017.zip',
+            2009: 'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2009.zip',
+            2010: 'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2010.zip',
+            2011: 'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2011.zip'}
 
-nomes_atrib = ['AnoCalendario', 'DataArquivamento', 'DataAbertura', 'CodigoRegiao',
-       'Regiao', 'UF', 'strRazaoSocial', 'strNomeFantasia', 'Tipo',
-       'NumeroCNPJ', 'RadicalCNPJ', 'RazaoSocialRFB', 'NomeFantasiaRFB',
-       'CNAEPrincipal', 'DescCNAEPrincipal', 'Atendida', 'CodigoAssunto',
-       'DescricaoAssunto', 'CodigoProblema', 'DescricaoProblema',
-       'SexoConsumidor', 'FaixaEtariaConsumidor', 'CEPConsumidor']
+list_zip =['dados_PROCON/zips/reclamacoes-fundamentadas-2018-em-zip.zip',
+           'dados_PROCON/zips/cnrf2017.zip',
+           'dados_PROCON/zips/crf2019-dados-abertos.zip',
+           'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2012.zip',
+           'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2013-1.zip',
+           'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2014.zip',
+           'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2015.zip',
+           'dados_PROCON/zips/cnrf2017.zip',
+           'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2009.zip',
+           'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2010.zip',
+           'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2011.zip']
 
-df_names = []
+try: 
+  os.path('dados_PROCON/cnrf2017')
+except:
+  for caminho in list_zip:
+    caminho_certo = 'dados_PROCON/' + caminho[:-4]
+    with zipfile.ZipFile(caminho, 'r') as zip_ref:
+      zip_ref.extractall(caminho_certo)
 
-for year in dict_problematicos.keys(): 
-  caminho = str(dict_problematicos.get(year))
-  name = "df_"+str(year)
-  locals()[name] = pd.read_csv(caminho, sep=';', error_bad_lines=False, encoding = 'latin')
-  locals()[name].columns = nomes_atrib
-  df_names.append(locals()[name])
-  print('OK {}'.format(name))
-
-for year in dict_arq.keys(): 
-  caminho = str(dict_arq.get(year))
-  name = "df_"+str(year)
-  locals()[name] = pd.read_csv(caminho, sep=';', error_bad_lines=False, encoding = "utf-8", warn_bad_lines= False)
-  locals()[name].columns = nomes_atrib
-  df_names.append(locals()[name])
-  print('OK {}'.format(name))
-
-df_all = pd.concat(df_names)
-df_all.drop(['AnoCalendario','CodigoRegiao','RadicalCNPJ','NomeFantasiaRFB','RazaoSocialRFB','CNAEPrincipal','CodigoAssunto','CodigoProblema'],inplace= True, axis = 1)
-df_all['DataArquivamento'] = pd.to_datetime(df_all['DataArquivamento'], format='%Y-%m-%d %H:%M:%S.%f') #%Y-%m-%d %H:%M:%S
-df_all['DataAbertura'] =  pd.to_datetime(df_all['DataAbertura'], format='%Y-%m-%d %H:%M:%S.%f') #%Y-%m-%d %H:%M:%S
-df_all['Ano'] = pd.DatetimeIndex(df_all['DataArquivamento']).year
-df_all['Mês'] = pd.DatetimeIndex(df_all['DataArquivamento']).month
-df_all['Dia'] = pd.DatetimeIndex(df_all['DataArquivamento']).day
-df_all['Dia da Semana'] = pd.DatetimeIndex(df_all['DataArquivamento']).weekday
-df_all['Tempo de Atendimento'] = df_all['DataArquivamento'] - df_all['DataAbertura']
-
-
-df_all.to_csv('dados_consolidados.csv')
 
