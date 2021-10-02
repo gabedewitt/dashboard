@@ -69,12 +69,19 @@ def create_df():
     return df_all
  
 
-df = create_df()
+df_org = create_df()
 
+pd.set_option('precision', 0)
 with st.sidebar: 
-    st.selectbox('Selecione o ano', df.Ano.dropna().sort_values().unique())
+    year = st.selectbox('Selecione o ano', df_org.Ano.dropna().sort_values().unique())
+    st.write("O ano  destacado é " + str(year))
+    setor = st.selectbox('Selecione o setor', df_org.DescCNAEPrincipal.dropna().sort_values().unique())
+    st.write("O setor destacado é " + str(setor))
 
-st.bar_chart(df.Ano.value_counts())
+
+st.bar_chart(df_org.Ano.value_counts(), )
+
+df = df_org.loc[df_org['Ano'] == year]
 
 df1 = df.DescCNAEPrincipal.value_counts().head(10)
 fig1 = px.bar(df1, orientation= 'h', color = df1.index)
@@ -84,6 +91,7 @@ st.plotly_chart(fig1, use_container_width=True)
 st.dataframe(df1.index)
 col1, col2 = st.columns(2)
 
+df = df.loc[df['DescCNAEPrincipal'] == setor]
 df2 = df.SexoConsumidor.value_counts()
 fig2 = px.pie(df2, values = df2.values, color = df2.index, hole=.3)
 col1.plotly_chart(fig2, use_container_width=True)
