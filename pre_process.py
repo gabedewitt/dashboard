@@ -33,6 +33,7 @@ list_zip =['dados_PROCON/zips/reclamacoes-fundamentadas-2018-em-zip.zip',
            'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2013-1.zip',
            'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2014.zip',
            'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2015.zip',
+           'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2016v2.zip',
            'dados_PROCON/zips/cnrf2017.zip',
            'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2009.zip',
            'dados_PROCON/zips/reclamacoes-fundamentadas-sindec-2010.zip',
@@ -43,6 +44,7 @@ try:
 except:
   for caminho in list_zip:
     caminho_certo = caminho[:-4]
+    caminho_certo = caminho_certo.replace("/zips","")
     with zipfile.ZipFile(caminho, 'r') as zip_ref:
       zip_ref.extractall(caminho_certo)
 
